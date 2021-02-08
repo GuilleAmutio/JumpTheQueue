@@ -1,0 +1,45 @@
+version: '3'
+services:
+  jtq-reverseproxy:
+    build: 'reverse-proxy/'
+    restart: always
+    container_name: 'jtq_reverse_proxy'
+    image: jump-the-queue/reverse-proxy:latest
+    ports:
+      - 80:80
+    networks:
+      - localA
+  java:
+    build: 'java/'
+    restart: always
+    depends_on: 
+      - database
+    container_name: 'jtq_java'
+    image: jump-the-queue/java:latest
+    networks:
+      - localA
+  angular:
+    build: 'angular/'
+    restart: always
+    container_name: 'jtq_angular'
+    image: jump-the-queue/angular:latest
+    networks:
+      - localA
+  database:
+    image: 'mysql:latest'
+    restart: always
+    container_name: 'jtq_database'
+    cap_add:
+      - SYS_NICE
+    ports:
+      - '3306:3306'
+    networks:
+      - localA
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=jumpthequeue_db
+      - MYSQL_USER=jumpthequeue
+      - MYSQL_PASSWORD=user
+networks:
+  localA:
+    driver: bridge
